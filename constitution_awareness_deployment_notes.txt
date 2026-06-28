@@ -1,0 +1,600 @@
+CONSTITUTION AWARENESS PROJECT DEPLOYMENT NOTES
+Project: Awareness on Constitution of India
+GitHub Repo: https://github.com/srahulkumar2003/awareness-constitution-india
+Frontend Live URL: https://awareness-constitution-india.vercel.app/
+Backend Health URL: https://constitution-backend-production.up.railway.app/api/health
+Backend API Base URL: https://constitution-backend-production.up.railway.app/api
+
+Generated Notes Date: 2026-06-29
+
+============================================================
+1. FINAL DEPLOYMENT STATUS
+============================================================
+
+Frontend: Vercel - Working
+Backend: Railway - Working
+Database: Railway MySQL - Working
+API Connection: Working
+Survey Submit: Working
+Constitution Agent / Gemini Chatbot: Working after adding GEMINI_API_KEY
+Backend Health Check: Working
+
+Confirmed backend health response:
+
+{
+  "status": "UP",
+  "project": "Awareness on Constitution of India"
+}
+
+============================================================
+2. PROJECT STRUCTURE
+============================================================
+
+GitHub Repository:
+https://github.com/srahulkumar2003/awareness-constitution-india
+
+Main folders:
+- frontend
+- backend
+
+Frontend:
+- Vite project
+- Deployed on Vercel
+- Uses VITE_API_URL to call backend API
+
+Backend:
+- Spring Boot project
+- Deployed on Railway
+- Uses Railway MySQL database
+- Uses GEMINI_API_KEY for live Constitution Agent answers
+
+============================================================
+3. GITHUB COMMANDS USED
+============================================================
+
+Run these only from the project folder:
+
+cd C:\Users\22000\Downloads\awareness-constitution-india
+
+git init
+git add .
+git commit -m "Initial constitution awareness project"
+git branch -M main
+git remote add origin https://github.com/srahulkumar2003/awareness-constitution-india.git
+git push -u origin main
+
+If Git already exists and repo is already connected, use:
+
+git add .
+git commit -m "Update project"
+git push
+
+If remote origin already exists:
+
+git remote set-url origin https://github.com/srahulkumar2003/awareness-constitution-india.git
+git push -u origin main
+
+Important Git output that confirmed success:
+
+Everything up-to-date
+Your branch is up to date with 'origin/main'.
+working tree clean
+
+============================================================
+4. RAILWAY BACKEND DEPLOYMENT
+============================================================
+
+Railway project:
+secure-peace
+
+Environment:
+production
+
+Backend service name:
+constitution-backend
+
+GitHub repo:
+https://github.com/srahulkumar2003/awareness-constitution-india
+
+Railway backend settings:
+
+Root Directory:
+backend
+
+Builder:
+Dockerfile / Auto detected
+
+Branch:
+main
+
+Service Name:
+constitution-backend
+
+Public backend URL:
+https://constitution-backend-production.up.railway.app
+
+Health endpoint:
+https://constitution-backend-production.up.railway.app/api/health
+
+Expected response:
+
+{
+  "status": "UP",
+  "project": "Awareness on Constitution of India"
+}
+
+============================================================
+5. RAILWAY MYSQL DATABASE SETUP
+============================================================
+
+Inside same Railway project:
+
+New -> Database -> Add MySQL
+
+Database service name:
+MySQL
+
+Railway MySQL provides variables like:
+
+MYSQLHOST
+MYSQLPORT
+MYSQLUSER
+MYSQLPASSWORD
+MYSQLDATABASE
+MYSQL_URL
+MYSQL_PUBLIC_URL
+MYSQL_ROOT_PASSWORD
+
+Important:
+Do not paste secrets into public chat.
+Use the variables only inside Railway.
+
+============================================================
+6. BACKEND APPLICATION.PROPERTIES
+============================================================
+
+This backend configuration was correct:
+
+spring.application.name=awareness-constitution-backend
+server.port=${PORT:8080}
+
+spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/constitution_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+spring.datasource.username=${DB_USERNAME:root}
+spring.datasource.password=${DB_PASSWORD:root}
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+app.cors.allowed-origins=${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+gemini.api.key=${GEMINI_API_KEY:}
+gemini.model=${GEMINI_MODEL:gemini-2.5-flash}
+
+============================================================
+7. RAILWAY BACKEND ENVIRONMENT VARIABLES
+============================================================
+
+Go to:
+
+Railway -> constitution-backend -> Variables -> Raw Editor
+
+Final backend variables:
+
+PORT=8080
+DB_URL=jdbc:mysql://${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}}/${{MySQL.MYSQLDATABASE}}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+DB_USERNAME=${{MySQL.MYSQLUSER}}
+DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
+GEMINI_API_KEY=YOUR_NEW_GEMINI_API_KEY
+GEMINI_MODEL=gemini-2.5-flash
+CORS_ALLOWED_ORIGINS=https://awareness-constitution-india.vercel.app,http://localhost:5173
+
+Important:
+Each variable must be on a separate line.
+Do not put all variables in one line.
+Do not use DB_URL=mysql://...
+Spring Boot needs DB_URL=jdbc:mysql://...
+
+If private MySQL host has connection issues, use TCP proxy format:
+
+DB_URL=jdbc:mysql://${{MySQL.RAILWAY_TCP_PROXY_DOMAIN}}:${{MySQL.RAILWAY_TCP_PROXY_PORT}}/${{MySQL.MYSQLDATABASE}}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+Keep:
+
+DB_USERNAME=${{MySQL.MYSQLUSER}}
+DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
+
+============================================================
+8. RAILWAY NETWORKING
+============================================================
+
+Go to:
+
+Railway -> constitution-backend -> Settings -> Networking
+
+Generate public domain.
+
+Backend public domain:
+https://constitution-backend-production.up.railway.app
+
+Target Port:
+8080
+
+If the base URL shows Whitelabel Error Page 404, that is normal because / route is not mapped.
+
+Correct test URL:
+https://constitution-backend-production.up.railway.app/api/health
+
+============================================================
+9. RAILWAY ERRORS AND FIXES
+============================================================
+
+Error 1:
+Application failed to respond
+
+Meaning:
+Railway domain was live, but backend app crashed or was not responding.
+
+Fixes checked:
+- Backend logs
+- Target port set to 8080
+- Added PORT=8080
+- Checked database variables
+- Redeployed backend
+
+Error 2:
+Whitelabel Error Page
+status=404
+
+Meaning:
+Opened backend root URL:
+https://constitution-backend-production.up.railway.app/
+
+This is normal because backend does not have a homepage route.
+
+Correct URL:
+https://constitution-backend-production.up.railway.app/api/health
+
+Error 3:
+BeanCreationException
+Unable to open JDBC Connection
+Communications link failure
+
+Meaning:
+Spring Boot was running, but could not connect to Railway MySQL.
+
+Fix:
+Use correct JDBC DB_URL:
+
+DB_URL=jdbc:mysql://${{MySQL.MYSQLHOST}}:${{MySQL.MYSQLPORT}}/${{MySQL.MYSQLDATABASE}}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+DB_USERNAME=${{MySQL.MYSQLUSER}}
+DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
+
+Then redeploy backend.
+
+Build logs showed:
+- mvn package successful
+- image push successful
+
+That confirmed Docker build was not the problem.
+
+============================================================
+10. VERCEL FRONTEND DEPLOYMENT
+============================================================
+
+Vercel project:
+awareness-constitution-india
+
+GitHub repo:
+https://github.com/srahulkumar2003/awareness-constitution-india
+
+Correct Vercel settings:
+
+Framework Preset:
+Vite
+
+Root Directory:
+frontend
+
+Build Command:
+npm run build
+
+Output Directory:
+dist
+
+Install Command:
+npm install
+
+Environment Variable:
+
+VITE_API_URL=https://constitution-backend-production.up.railway.app/api
+
+Important:
+The Vercel root directory must be frontend.
+If root directory is ./, Vercel tries to build from repo root and fails.
+
+============================================================
+11. VERCEL ERRORS AND FIXES
+============================================================
+
+Error:
+sh: line 1: vite: command not found
+Error: Command "vite build" exited with 127
+
+Reason:
+Vercel was building from repo root:
+Root Directory: ./
+
+But Vite is inside:
+frontend
+
+Fix:
+Change Vercel root directory to:
+
+frontend
+
+Then keep:
+
+Framework Preset: Vite
+Build Command: npm run build
+Output Directory: dist
+Install Command: npm install
+
+Then redeploy with build cache off.
+
+Error:
+404: NOT_FOUND
+
+Reason:
+Frontend build output was not being served correctly because Vercel settings were wrong.
+
+Fix:
+Set Root Directory to frontend and Output Directory to dist.
+
+============================================================
+12. VERCEL ENVIRONMENT VARIABLE SETUP
+============================================================
+
+Go to:
+
+Vercel -> awareness-constitution-india -> Settings -> Environments -> Production -> Environment Variables
+
+Add:
+
+Key:
+VITE_API_URL
+
+Value:
+https://constitution-backend-production.up.railway.app/api
+
+Environment:
+Production
+
+Better if available:
+Production, Preview, and Development
+
+After adding or changing env variable:
+Vercel -> Deployments -> Latest Deployment -> three dots -> Redeploy
+
+Choose:
+Use existing Build Cache: OFF
+
+Reason:
+Vite reads VITE_API_URL at build time, so Vercel must be redeployed after changing it.
+
+============================================================
+13. CORS SETUP
+============================================================
+
+After Vercel gave live URL:
+
+Frontend URL:
+https://awareness-constitution-india.vercel.app/
+
+Railway backend variable:
+
+CORS_ALLOWED_ORIGINS=https://awareness-constitution-india.vercel.app,http://localhost:5173
+
+Then restart/redeploy Railway backend.
+
+Without this, browser API calls may be blocked by CORS.
+
+============================================================
+14. CONFIRMED LIVE LINKS
+============================================================
+
+Frontend:
+https://awareness-constitution-india.vercel.app/
+
+Backend:
+https://constitution-backend-production.up.railway.app
+
+Backend API:
+https://constitution-backend-production.up.railway.app/api
+
+Backend Health:
+https://constitution-backend-production.up.railway.app/api/health
+
+GitHub Repo:
+https://github.com/srahulkumar2003/awareness-constitution-india
+
+============================================================
+15. SURVEY TEST
+============================================================
+
+Test page:
+https://awareness-constitution-india.vercel.app/survey
+
+Confirmed message:
+Survey submitted successfully. Thank you for sharing your opinion.
+
+This confirms:
+- Frontend is working
+- Backend API is connected
+- Railway MySQL is connected
+- Survey data is being submitted
+
+============================================================
+16. CONSTITUTION AGENT / GEMINI SETUP
+============================================================
+
+Before Gemini key:
+Chatbot showed Offline Tutor mode.
+
+Message:
+I can explain Fundamental Rights, Fundamental Duties, DPSP, the Judiciary, the Preamble or Reservation policy in simple language with Article references and case law. Try asking about one of these topics, or set GEMINI_API_KEY on the backend for open-ended live answers.
+
+Meaning:
+Frontend and backend are connected, but GEMINI_API_KEY was missing.
+
+Fix:
+Go to Google AI Studio -> API Keys -> Create API key
+
+Then add key in Railway backend:
+
+GEMINI_API_KEY=YOUR_NEW_GEMINI_API_KEY
+GEMINI_MODEL=gemini-2.5-flash
+
+Then redeploy/restart Railway backend.
+
+Important:
+Do not add GEMINI_API_KEY to Vercel.
+Gemini API key must stay in Railway backend only.
+
+Important security note:
+An API key was pasted in chat during setup.
+That key must be revoked/deleted in Google AI Studio.
+Use only a new regenerated key in Railway.
+
+============================================================
+17. GOOGLE AI STUDIO API KEY STEPS
+============================================================
+
+Go to:
+Google AI Studio -> API Keys
+
+Click:
+Create API key
+
+Choose:
+Create API key in new project
+
+Copy the key.
+
+Do not share it publicly.
+
+Add it to Railway:
+
+Railway -> constitution-backend -> Variables
+
+GEMINI_API_KEY=your_actual_new_key
+GEMINI_MODEL=gemini-2.5-flash
+
+Then:
+Redeploy / Restart
+
+============================================================
+18. FINAL TEST CHECKLIST
+============================================================
+
+1. Backend health:
+https://constitution-backend-production.up.railway.app/api/health
+
+Expected:
+{
+  "status": "UP",
+  "project": "Awareness on Constitution of India"
+}
+
+2. Frontend:
+https://awareness-constitution-india.vercel.app/
+
+3. Survey:
+Go to /survey and submit survey.
+Expected:
+Survey submitted successfully.
+
+4. Constitution Agent:
+Ask:
+Explain Article 21 with case law
+
+Expected:
+Live Gemini answer, not Offline Tutor message.
+
+5. Dashboard:
+Check if survey results load.
+
+6. Explorer:
+Check if content pages open.
+
+============================================================
+19. COMMON FUTURE UPDATE PROCESS
+============================================================
+
+When changing code locally:
+
+cd C:\Users\22000\Downloads\awareness-constitution-india
+
+git add .
+git commit -m "Update project"
+git push
+
+Then:
+- Railway backend will redeploy if backend files changed
+- Vercel frontend will redeploy if frontend files changed
+
+If Vercel env variable changes:
+Redeploy Vercel manually.
+
+If Railway env variable changes:
+Restart/Redeploy Railway backend manually.
+
+============================================================
+20. SHORT PROJECT DESCRIPTION FOR RESUME / LINKEDIN
+============================================================
+
+Awareness on Constitution of India
+A full-stack constitution awareness platform built with a Vite frontend, Spring Boot backend, Railway MySQL database, and Gemini-powered Constitution Agent. The platform includes constitutional learning sections, surveys, dashboard, tutor/chatbot, quiz, judgments, and public awareness content. Deployed frontend on Vercel and backend with MySQL on Railway.
+
+Live:
+https://awareness-constitution-india.vercel.app/
+
+Backend Health:
+https://constitution-backend-production.up.railway.app/api/health
+
+GitHub:
+https://github.com/srahulkumar2003/awareness-constitution-india
+
+============================================================
+21. QUICK DEPLOYMENT SUMMARY
+============================================================
+
+GitHub:
+Push full project to GitHub.
+
+Railway:
+Deploy backend from backend folder.
+Add MySQL database.
+Set backend env variables:
+PORT
+DB_URL
+DB_USERNAME
+DB_PASSWORD
+CORS_ALLOWED_ORIGINS
+GEMINI_API_KEY
+GEMINI_MODEL
+
+Vercel:
+Deploy frontend from frontend folder.
+Set:
+VITE_API_URL=https://constitution-backend-production.up.railway.app/api
+
+CORS:
+Set Railway CORS_ALLOWED_ORIGINS to Vercel URL.
+
+Final:
+Test survey, dashboard, chatbot, and backend health endpoint.
+
+============================================================
+END OF NOTES
+============================================================
