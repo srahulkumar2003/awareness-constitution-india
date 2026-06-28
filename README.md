@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Awareness on Constitution of India
 
 Interactive Constitution learning platform with intro video, animated Indian civic UI, Constitution Explorer, survey dashboard, quiz and Gemini AI guide.
@@ -152,3 +153,7 @@ EC2 for backend, RDS for MySQL, S3 for media, CloudFront for CDN
 8. Add Gemini API key
 9. Test Ask AI
 10. Deploy frontend and backend
+=======
+# awareness-constitution-india
+Civic learning platform teaching rights, duties, democracy and governance through interactive modules, surveys, dashboards and visual storytelling. Includes explorer pages, survey flows, campaigns and analytics dashboards. Built with React, Spring Boot, MySQL, JWT-secured REST APIs and Chart.js for scalable, insight-driven architecture.
+>>>>>>> 5347986f9dcebb7cad6616f1add1546780575970
